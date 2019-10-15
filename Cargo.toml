@@ -1,0 +1,12 @@
+[package]
+name = "dinowm"
+version = "0.1.0"
+authors = ["Jan Alexandra Katz <beeswaxboffin@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+gtk = "0.7"
+toml = "0.5"
+xcb = "0.8"
