@@ -1,5 +1,29 @@
 use xcb;
 
+macro_rules! handle_key_error {
+    ($1: expr, $2: expr, $3: expr) => {
+         match $1 {
+            Ok(_) => (),
+            Err(_) => {
+                // TODO convert the keycode and modifiers into human-readable strings
+                eprintln!("Failed to ungrab key: keycode {}, modifiers {}", $2, $3);
+            }
+        }       
+    }
+}
+
+macro_rules! handle_mouse_error {
+    ($1: expr, $2: expr, $3, expr) => {
+        match $1 {
+            Ok(_) => (),
+            Err(_) => {
+                // TODO convert the button and modifiers into human-readable strings
+                eprintln!("Failed to ungrab mouse: button {}, modifiers {}", $2, $3);
+            }
+        }
+    }
+}
+
 enum BindAction {
     Exec {
         command: &str,
@@ -47,6 +71,29 @@ impl Binding {
         }
     }
 
+    pub fn ungrab(&self, connection: xcb::Connection, root: xcb::Window) {
+        match self.BindType {
+            BindType::KeyBind => {
+                let reply = xcb::ungrab_key(
+                    connection,
+                    key,
+                    root,
+                    modifiers,
+                ).get_reply();
+                handle_key_error!(reply, key, modifiers);
+            }
+            BindType::MouseBind => {
+                let reply = xcb::ungrab_button(
+                    connection,
+                    button,
+                    root,
+                    modifiers,
+                ).get_reply();
+                handle_mouse_error!(reply, button, modifiers);
+            }
+        }
+    }
+
     fn grab_key(
         connection: xcb::Connection,
         root: xcb::Window,
@@ -62,13 +109,7 @@ impl Binding {
             xcb::GRAB_MODE_ASYNC,
             xcb::GRAB_MODE_ASYNC,
         ).get_reply();
-        match reply {
-            Ok(_) => (),
-            Err(_) => {
-                // TODO convert the keycode and modifiers into human-readable strings
-                eprintln!("Failed to grab key: keycode {}, modifiers {}", key, modifiers);
-            }
-        }
+        handle_key_error!(reply, key, modifiers);
     }
 
     fn grab_button(
@@ -89,12 +130,6 @@ impl Binding {
             modifiers,
 
         ).get_reply();
-        match reply {
-            Ok(_) => (),
-            Err(_) => {
-                // TODO convert modifiers into human-readable strings
-                eprintln!("Failed to grab mouse: button {}, modifiers {}", button, modifiers);
-            }
-        }
+        handle_mouse_error!(reply, button, modifiers);
     }
 }
