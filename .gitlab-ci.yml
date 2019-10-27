@@ -6,4 +6,5 @@ before_script:
 build:
   stage: build
   script:
+    - cargo check
     - cargo build

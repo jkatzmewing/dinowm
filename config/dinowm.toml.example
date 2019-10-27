@@ -1,0 +1,24 @@
+[style]
+border_width = 4
+title_width = 12
+
+[bindings]
+
+[bindings.terminal]
+mods = "W" # Winkey
+key = "Return"
+action = "Exec"
+command = "gnome-terminal"
+
+[bindings.lock]
+mods = "W"
+key = "l"
+action = "Exec"
+command = "i3lock"
+
+[bindings.menu]
+mods = "W"
+key = "p"
+action = "Exec"
+command = "rofi -show drun"
+
