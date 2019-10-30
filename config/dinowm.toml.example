@@ -2,21 +2,19 @@
 border_width = 4
 title_width = 12
 
-[bindings]
-
-[bindings.terminal]
+[[bindings]]
 mods = "W" # Winkey
 key = "Return"
 action = "Exec"
 command = "gnome-terminal"
 
-[bindings.lock]
+[[bindings]]
 mods = "W"
 key = "l"
 action = "Exec"
 command = "i3lock"
 
-[bindings.menu]
+[[bindings]]
 mods = "W"
 key = "p"
 action = "Exec"

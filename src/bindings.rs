@@ -1,5 +1,3 @@
-use xcb;
-
 use std::convert::TryInto;
 
 pub enum BindAction {
@@ -8,8 +6,6 @@ pub enum BindAction {
     },
     RaiseWindow,
     LowerWindow,
-    MoveWindow,
-    ResizeWindow,
 }
 
 pub struct Binding {
