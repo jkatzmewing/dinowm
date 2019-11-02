@@ -1,3 +1,5 @@
+use gdk;
+
 use std::convert::TryInto;
 
 pub enum BindAction {
@@ -6,47 +8,29 @@ pub enum BindAction {
     },
     RaiseWindow,
     LowerWindow,
+    MoveWindow,
+    ResizeWindow,
+}
+
+pub enum InputType {
+    Key {
+        keyval: u32,
+    },
+    Button {
+        button: u32,
+    },
 }
 
 pub struct Binding {
-    pub key: xcb::Keycode,
-    pub modifiers: u16,
+    pub input: InputType,
+    pub modifiers: gdk::ModifierType,
     pub action: BindAction,
 }
 
-impl Binding {
-    pub fn grab(&self, connection: xcb::Connection, root: xcb::Window) {
-        Binding::grab_key(
-            connection,
-            root,
-            self.key,
-            self.modifiers,
-        );
-    }
 
-    pub fn ungrab(&self, connection: xcb::Connection, root: xcb::Window) {
-        xcb::ungrab_key(
-            &connection,
-            self.key,
-            root,
-            self.modifiers,
-        );
-    }
+pub fn process_keyval(k: u32, state: Option<gdk::ModifierType>) {
+}
 
-    fn grab_key(
-        connection: xcb::Connection,
-        root: xcb::Window,
-        key: xcb::Keycode,
-        modifiers: u16,
-    ) {
-        xcb::grab_key(
-            &connection,
-            false,
-            root,
-            modifiers,
-            key,
-            xcb::GRAB_MODE_ASYNC.try_into().unwrap(),
-            xcb::GRAB_MODE_ASYNC.try_into().unwrap(),
-        );
-    }
+pub fn process_button(b: u32, state: Option<gdk::ModifierType>) {
+
 }

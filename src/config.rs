@@ -1,5 +1,5 @@
+use gdk;
 use toml;
-use xcb;
 
 use toml::Value;
 
@@ -27,7 +27,9 @@ pub fn load_config(path: &str) -> (Style, Vec<Binding>) {
     for elem in doc["bindings"].as_array().unwrap().iter() {
         let mut binding: Binding;
         binding.modifiers = parse_mods(elem["mods"].as_str().unwrap());
-        binding.key = parse_key(elem["key"].as_str().unwrap());
+        binding.input = InputType::Key {
+            keyval: gdk::keyval_from_name(elem["key"].as_str().unwrap()),
+        };
         binding.action = parse_action(elem["action"].as_str().unwrap());
 
         all_bindings.push(binding);
@@ -36,27 +38,25 @@ pub fn load_config(path: &str) -> (Style, Vec<Binding>) {
     (style, all_bindings)
 }
 
-fn parse_mods(input: &str) -> u16 {
+fn parse_mods(input: &str) -> gdk::ModifierType {
+    use gdk::ModifierType as Mod;
     let text = input.to_string();
-    let mut mods: u32 = 0;
+    let mut mods = gdk::ModifierType::empty();
     // TODO add support for Apple command key
     if text.contains("alt") {
-        mods |= xcb::MOD_MASK_1;
+        mods.set(Mod::MOD1_MASK, true);
     }
     if text.contains("control") {
-        mods |= xcb::MOD_MASK_CONTROL;
+        mods.set(Mod::CONTROL_MASK, true);
     }
     if text.contains("shift") {
-        mods |= xcb::MOD_MASK_SHIFT;
+        mods.set(Mod::SHIFT_MASK, true);
     }
     if text.contains("win") {
-        mods |= xcb::MOD_MASK_4;
+        mods.set(Mod::MOD4_MASK, true);
     }
 
-    mods.try_into().unwrap()
-}
-
-fn parse_key(input: &str) -> xcb::Keycode {
+    mods
 }
 
 fn parse_action(input: &str) -> BindAction {
@@ -72,7 +72,11 @@ fn parse_action(input: &str) -> BindAction {
         action = BindAction::RaiseWindow;
     } else if text == "lower-window" {
         action = BindAction::LowerWindow;
-    };
+    } else if text == "resize-window" {
+        action = BindAction::ResizeWindow;
+    } else if text == "move-window" {
+        action = BindAction::MoveWindow;
+    }
     
     action
 }
