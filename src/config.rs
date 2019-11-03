@@ -3,7 +3,6 @@ use toml;
 
 use toml::Value;
 
-use std::convert::TryInto;
 use std::fs;
 
 use crate::bindings::*;

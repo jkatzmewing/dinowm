@@ -1,4 +1,3 @@
-#[derive(Clone)]
 pub enum BindAction {
     Exec {
         command: String,
@@ -9,7 +8,6 @@ pub enum BindAction {
     ResizeWindow,
 }
 
-#[derive(Clone)]
 pub enum InputType {
     Key {
         keyval: u32,
@@ -19,7 +17,6 @@ pub enum InputType {
     },
 }
 
-#[derive(Clone)]
 pub struct Binding {
     pub input: InputType,
     pub modifiers: u32,
