@@ -30,12 +30,20 @@ fn main_loop(display: gdk::Display, style: Style, bindings: Vec<Binding>) {
         match ev {
             Some(e) => {
                 if let Some(k) = e.get_keyval() {
-                    bindings::process_keyval(k, e.get_state());
+                    bindings::process_keyval(k, get_event_state(e));
                 } else if let Some(b) = e.get_button() {
-                    bindings::process_button(b, e.get_state());
+                    bindings::process_button(b, get_event_state(e));
                 }
             }
             None => (),
         }
+    }
+}
+
+fn get_event_state(e: gdk::Event) -> u32 {
+    if let Some(state) = e.get_state() {
+        return state.bits()
+    } else {
+        return gdk::ModifierType::empty().bits()
     }
 }

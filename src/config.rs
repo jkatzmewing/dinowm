@@ -19,26 +19,32 @@ pub fn load_config(path: &str) -> (Style, Vec<Binding>) {
 
     // Parse the style
     let style = Style {
-        border_width: doc["style"]["border_width"].try_into().unwrap(),
-        titlebar_width: doc["style"]["titlebar_width"].try_into().unwrap(),
+        border_width: doc["style"]["border_width"]
+            .clone()
+            .try_into().
+            unwrap(),
+        titlebar_width: doc["style"]["titlebar_width"]
+            .clone()
+            .try_into()
+            .unwrap(),
     };
 
     let mut all_bindings = vec![];
     for elem in doc["bindings"].as_array().unwrap().iter() {
-        let mut binding: Binding;
-        binding.modifiers = parse_mods(elem["mods"].as_str().unwrap());
-        binding.input = InputType::Key {
-            keyval: gdk::keyval_from_name(elem["key"].as_str().unwrap()),
+        let binding = Binding {
+            modifiers: parse_mods(elem["mods"].as_str().unwrap()),
+            input: InputType::Key {
+                keyval: gdk::keyval_from_name(elem["key"].as_str().unwrap()),
+            },
+            action: parse_action(elem["action"].as_str().unwrap()),
         };
-        binding.action = parse_action(elem["action"].as_str().unwrap());
-
         all_bindings.push(binding);
     }
 
     (style, all_bindings)
 }
 
-fn parse_mods(input: &str) -> gdk::ModifierType {
+fn parse_mods(input: &str) -> u32 {
     use gdk::ModifierType as Mod;
     let text = input.to_string();
     let mut mods = gdk::ModifierType::empty();
@@ -56,7 +62,7 @@ fn parse_mods(input: &str) -> gdk::ModifierType {
         mods.set(Mod::MOD4_MASK, true);
     }
 
-    mods
+    mods.bits()
 }
 
 fn parse_action(input: &str) -> BindAction {
@@ -76,6 +82,8 @@ fn parse_action(input: &str) -> BindAction {
         action = BindAction::ResizeWindow;
     } else if text == "move-window" {
         action = BindAction::MoveWindow;
+    } else {
+        panic!("Config contains an invalid key or mouse binding action");
     }
     
     action

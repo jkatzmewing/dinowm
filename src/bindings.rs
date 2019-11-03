@@ -1,7 +1,4 @@
-use gdk;
-
-use std::convert::TryInto;
-
+#[derive(Clone)]
 pub enum BindAction {
     Exec {
         command: String,
@@ -12,6 +9,7 @@ pub enum BindAction {
     ResizeWindow,
 }
 
+#[derive(Clone)]
 pub enum InputType {
     Key {
         keyval: u32,
@@ -21,16 +19,17 @@ pub enum InputType {
     },
 }
 
+#[derive(Clone)]
 pub struct Binding {
     pub input: InputType,
-    pub modifiers: gdk::ModifierType,
+    pub modifiers: u32,
     pub action: BindAction,
 }
 
 
-pub fn process_keyval(k: u32, state: Option<gdk::ModifierType>) {
+pub fn process_keyval(k: u32, state: u32) {
 }
 
-pub fn process_button(b: u32, state: Option<gdk::ModifierType>) {
+pub fn process_button(b: u32, state: u32) {
 
 }
