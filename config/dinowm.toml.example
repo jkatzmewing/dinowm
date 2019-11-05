@@ -12,7 +12,7 @@ command = "gnome-terminal"
 mods = "W"
 key = "l"
 action = "Exec"
-command = "i3lock"
+command = "i3lock --color=000000"
 
 [[bindings]]
 mods = "W"
