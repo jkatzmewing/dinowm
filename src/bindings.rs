@@ -1,3 +1,5 @@
+use xcb;
+
 pub enum BindAction {
     Exec {
         command: String,
@@ -10,23 +12,16 @@ pub enum BindAction {
 
 pub enum InputType {
     Key {
-        keyval: u32,
+        key: xcb::Keysym,
     },
     Button {
-        button: u32,
+        button: xcb::Button,
     },
 }
 
 pub struct Binding {
     pub input: InputType,
-    pub modifiers: u32,
+    pub modifiers: u16,
     pub action: BindAction,
 }
 
-
-pub fn process_keyval(k: u32, state: u32) {
-}
-
-pub fn process_button(b: u32, state: u32) {
-
-}

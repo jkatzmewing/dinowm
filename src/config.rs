@@ -1,8 +1,10 @@
-use gdk;
 use toml;
+use x11_keysymdef;
+use xcb;
 
 use toml::Value;
 
+use std::convert::TryInto;
 use std::fs;
 
 use crate::bindings::*;
@@ -33,7 +35,7 @@ pub fn load_config(path: &str) -> (Style, Vec<Binding>) {
         let binding = Binding {
             modifiers: parse_mods(elem["mods"].as_str().unwrap()),
             input: InputType::Key {
-                keyval: gdk::keyval_from_name(elem["key"].as_str().unwrap()),
+                key: parse_keysym(elem["key"].as_str().unwrap()),
             },
             action: parse_action(elem["action"].as_str().unwrap()),
         };
@@ -43,7 +45,7 @@ pub fn load_config(path: &str) -> (Style, Vec<Binding>) {
     (style, all_bindings)
 }
 
-fn parse_mods(input: &str) -> u32 {
+fn parse_mods(input: &str) -> u16 {
     use gdk::ModifierType as Mod;
     let text = input.to_string();
     let mut mods = gdk::ModifierType::empty();
@@ -61,7 +63,12 @@ fn parse_mods(input: &str) -> u32 {
         mods.set(Mod::MOD4_MASK, true);
     }
 
-    mods.bits()
+    mods.bits().try_into().unwrap()
+}
+
+fn parse_keysym(input: &str) -> xcb::Keysym {
+    let record = x11_keysymdef::lookup_by_name(input).unwrap();
+    record.keysym.try_into().unwrap()
 }
 
 fn parse_action(input: &str) -> BindAction {
