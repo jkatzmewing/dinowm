@@ -6,9 +6,11 @@ mod bindings;
 mod config;
 mod style;
 mod windows;
+mod xorg;
 
 use bindings::Binding;
 use style::Style;
+use xorg::Xorg;
 
 const DINOWM_CONFIG_PATH: &str = ".config/dinowm/dinowm.toml";
 
@@ -19,30 +21,48 @@ fn main() {
     let setup = conn.get_setup();
     let screen = setup.roots().nth(screen_num as usize).unwrap();
     
-    main_loop(conn, setup, screen, style, bindings);
+    let xorg = Xorg {
+        connection: &conn,
+        setup: &setup,
+        screen: &screen,
+    };
+
+    main_loop(&xorg, style, bindings);
 }
 
 fn main_loop(
-    conn: xcb::Connection,
-    setup: xcb::Setup,
-    screen: xcb::Screen,
+    xorg: &Xorg,
     style: Style,
     bindings: Vec<Binding>
 ) {
     loop {
-        if let Some(ev) = conn.wait_for_event() {
+        if let Some(ev) = xorg.connection.wait_for_event() {
             match ev.response_type() & !0x80 {
                 xcb::KEY_PRESS => {
-                    bindings::process_key(con, ev, bindings);
+                    let key: &xcb::KeyPressEvent = unsafe {
+                        xcb::cast_event(&ev)
+                    };
+                    bindings::process_key(xorg, key, &bindings);
                 }
+                
                 xcb::BUTTON_PRESS => {
-                    bindings::process_button(conn, ev, bindings);
+                    let button: &xcb::ButtonPressEvent = unsafe {
+                        xcb::cast_event(&ev)  
+                    };
+                    bindings::process_button(xorg, button, &bindings);
                 }
+                
                 xcb::CREATE_NOTIFY => {
-                    windows::reparent_window(conn, ev, style);
+                    let notify: &xcb::CreateNotifyEvent = unsafe {
+                        xcb::cast_event(&ev)
+                    };
+                    windows::reparent_window(xorg, notify, &style);
                 }
+                
                 xcb::DESTROY_NOTIFY => {
                 }
+
+                _ => (),
             }
         }
     }

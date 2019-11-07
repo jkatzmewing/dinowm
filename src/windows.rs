@@ -1,5 +1,8 @@
-use gdk;
+use xcb;
 
-pub fn process_window(window: gdk::Window) {
-    match 
+use crate::style::Style;
+use crate::xorg::Xorg;
+
+pub fn reparent_window(xorg: &Xorg, ev: &xcb::CreateNotifyEvent, style: &Style) {
+    std::unimplemented!();
 }

@@ -46,24 +46,23 @@ pub fn load_config(path: &str) -> (Style, Vec<Binding>) {
 }
 
 fn parse_mods(input: &str) -> u16 {
-    use gdk::ModifierType as Mod;
     let text = input.to_string();
-    let mut mods = gdk::ModifierType::empty();
+    let mut mods = 0;
     // TODO add support for Apple command key
     if text.contains("alt") {
-        mods.set(Mod::MOD1_MASK, true);
+        mods |= xcb::MOD_MASK_1;
     }
     if text.contains("control") {
-        mods.set(Mod::CONTROL_MASK, true);
+        mods |= xcb::MOD_MASK_CONTROL;
     }
     if text.contains("shift") {
-        mods.set(Mod::SHIFT_MASK, true);
+        mods |= xcb::MOD_MASK_SHIFT;
     }
     if text.contains("win") {
-        mods.set(Mod::MOD4_MASK, true);
+        mods |= xcb::MOD_MASK_4;
     }
 
-    mods.bits().try_into().unwrap()
+    mods.try_into().unwrap()
 }
 
 fn parse_keysym(input: &str) -> xcb::Keysym {
