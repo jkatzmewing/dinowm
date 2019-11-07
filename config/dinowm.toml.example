@@ -1,6 +1,15 @@
 [style]
-border_width = 4
+border_width = 2
 title_width = 12
+
+titlebar_color_bg = "SlateBlue"
+titlebar_color_fg = "SlateBlue"
+
+border_color_bg = "LightGrey"
+border_color_fg = "White"
+
+text_color_bg = "LightGrey"
+text_color_fg = "White"
 
 [[bindings]]
 mods = "win" # Winkey
