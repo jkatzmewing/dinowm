@@ -1,6 +1,6 @@
 [style]
 border_width = 2
-title_width = 12
+titlebar_height = 12
 
 titlebar_color_bg = "SlateBlue"
 titlebar_color_fg = "SlateBlue"

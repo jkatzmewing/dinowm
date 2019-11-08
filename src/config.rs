@@ -24,10 +24,11 @@ pub fn load_config(path: &str) -> (Style, Vec<Binding>) {
             .clone()
             .try_into().
             unwrap(),
-        titlebar_width: doc["style"]["titlebar_width"]
+        titlebar_height: doc["style"]["titlebar_height"]
             .clone()
             .try_into()
             .unwrap(),
+        
     };
 
     let mut all_bindings = vec![];
