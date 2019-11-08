@@ -9,4 +9,4 @@ edition = "2018"
 [dependencies]
 toml = "0.5"
 x11-keysymdef = "0.2"
-xcb = "0.8"
+xcb = { version = "0.8", features = ["render"] }

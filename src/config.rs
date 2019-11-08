@@ -1,6 +1,7 @@
 use toml;
 use x11_keysymdef;
 use xcb;
+use xcb::render::Color;
 
 use toml::Value;
 
@@ -9,14 +10,43 @@ use std::fs;
 
 use crate::bindings::*;
 use crate::style::Style;
+use crate::xorg::Xorg;
 
 fn read_config_file(path: &str) -> String {
     fs::read_to_string(path).expect("Couldn't read config file")
 }
 
-pub fn load_config(path: &str) -> (Style, Vec<Binding>) {
+fn get_color(
+    xorg: Xorg,
+    cmap: xcb::Colormap,
+    name: &str
+) -> Color {
+    let reply = xcb::lookup_color(
+        xorg.connection,
+        cmap,
+        name,
+    ).get_reply().unwrap();
+    
+    Color::new(
+        reply.visual_red(),
+        reply.visual_green(),
+        reply.visual_blue(),
+        255
+    )
+}
+
+pub fn load_config(xorg: Xorg, path: &str) -> (Style, Vec<Binding>) {
     let config = read_config_file(path);
     let doc = config.parse::<Value>().unwrap();
+    let cmap = xorg.screen.default_colormap();
+
+    let process_color = |e: toml::Value| {
+        get_color(
+            xorg,
+            cmap,
+            e.clone().as_str().unwrap(),
+        )
+    };
 
     // Parse the style
     let style = Style {
@@ -28,7 +58,15 @@ pub fn load_config(path: &str) -> (Style, Vec<Binding>) {
             .clone()
             .try_into()
             .unwrap(),
-        
+
+        titlebar_color_bg: process_color(doc["style"]["titlebar_color_bg"]),
+        titlebar_color_fg: process_color(doc["style"]["titlebar_color_fg"]),
+
+        border_color_bg: process_color(doc["style"]["border_color_bg"]),
+        border_color_fg: process_color(doc["style"]["border_color_fg"]),
+
+        text_color_bg: process_color(doc["style"]["text_color_bg"]),
+        text_color_fg: process_color(doc["style"]["text_color_fg"]),
     };
 
     let mut all_bindings = vec![];

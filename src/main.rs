@@ -16,7 +16,6 @@ const DINOWM_CONFIG_PATH: &str = ".config/dinowm/dinowm.toml";
 
 // TODO fix this to not use a purely relative config path
 fn main() {
-    let (style, bindings) = config::load_config(DINOWM_CONFIG_PATH);
     let (conn, screen_num) = xcb::Connection::connect(None).unwrap();
     let setup = conn.get_setup();
     let screen = setup.roots().nth(screen_num as usize).unwrap();
@@ -26,7 +25,7 @@ fn main() {
         setup: &setup,
         screen: &screen,
     };
-
+    let (style, bindings) = config::load_config(xorg, DINOWM_CONFIG_PATH);
     main_loop(&xorg, style, bindings);
 }
 
