@@ -12,17 +12,17 @@ text_color_bg = "LightGrey"
 text_color_fg = "White"
 
 [[bindings]]
-mods = "win" # Winkey
+mods = "W" # Winkey
 key = "Return"
 action = "exec:gnome-terminal"
 
 [[bindings]]
-mods = "win"
+mods = "W"
 key = "l"
 action = "exec:i3lock --color=000000"
 
 [[bindings]]
-mods = "win"
+mods = "W"
 key = "p"
 action = "exec:rofi -show drun"
 

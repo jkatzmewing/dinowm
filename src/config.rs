@@ -70,16 +70,16 @@ fn parse_mods(input: &str) -> u16 {
     let text = input.to_string();
     let mut mods = 0;
     // TODO add support for Apple command key
-    if text.contains("alt") {
+    if text.contains("A") {
         mods |= xcb::MOD_MASK_1;
     }
-    if text.contains("control") {
+    if text.contains("C") {
         mods |= xcb::MOD_MASK_CONTROL;
     }
-    if text.contains("shift") {
+    if text.contains("S") {
         mods |= xcb::MOD_MASK_SHIFT;
     }
-    if text.contains("win") {
+    if text.contains("W") {
         mods |= xcb::MOD_MASK_4;
     }
 
