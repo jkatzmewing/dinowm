@@ -3,9 +3,7 @@ use xcb;
 use crate::xorg::Xorg;
 
 pub enum BindAction {
-    Exec {
-        command: String,
-    },
+    Exec { command: String },
     RaiseWindow,
     LowerWindow,
     MoveWindow,
@@ -13,12 +11,8 @@ pub enum BindAction {
 }
 
 pub enum InputType {
-    Key {
-        key: xcb::Keysym,
-    },
-    Button {
-        button: xcb::Button,
-    },
+    Key { key: xcb::Keysym },
+    Button { button: xcb::Button },
 }
 
 pub struct Binding {

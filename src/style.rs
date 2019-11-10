@@ -14,4 +14,3 @@ pub struct Style {
     pub text_color_bg: Color,
     pub text_color_fg: Color,
 }
-

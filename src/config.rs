@@ -16,22 +16,16 @@ fn read_config_file(path: &str) -> String {
     fs::read_to_string(path).expect("Couldn't read config file")
 }
 
-fn get_color(
-    xorg: &Xorg,
-    cmap: xcb::Colormap,
-    name: &str
-) -> Color {
-    let reply = xcb::lookup_color(
-        xorg.connection,
-        cmap,
-        name,
-    ).get_reply().unwrap();
-    
+fn get_color(xorg: &Xorg, cmap: xcb::Colormap, name: &str) -> Color {
+    let reply = xcb::lookup_color(xorg.connection, cmap, name)
+        .get_reply()
+        .unwrap();
+
     Color::new(
         reply.visual_red(),
         reply.visual_green(),
         reply.visual_blue(),
-        255
+        255,
     )
 }
 
@@ -40,24 +34,12 @@ pub fn load_config(xorg: &Xorg, path: &str) -> (Style, Vec<Binding>) {
     let doc = config.parse::<Value>().unwrap();
     let cmap = xorg.screen.default_colormap();
 
-    let process_color = |e: toml::Value| {
-        get_color(
-            &xorg,
-            cmap,
-            e.as_str().unwrap(),
-        )
-    };
+    let process_color = |e: toml::Value| get_color(&xorg, cmap, e.as_str().unwrap());
 
     // Parse the style
     let style = Style {
-        border_width: doc["style"]["border_width"]
-            .clone()
-            .try_into().
-            unwrap(),
-        titlebar_height: doc["style"]["titlebar_height"]
-            .clone()
-            .try_into()
-            .unwrap(),
+        border_width: doc["style"]["border_width"].clone().try_into().unwrap(),
+        titlebar_height: doc["style"]["titlebar_height"].clone().try_into().unwrap(),
 
         titlebar_color_bg: process_color(doc["style"]["titlebar_color_bg"].clone()),
         titlebar_color_fg: process_color(doc["style"]["titlebar_color_fg"].clone()),
@@ -129,6 +111,6 @@ fn parse_action(input: &str) -> BindAction {
     } else {
         panic!("Config contains an invalid key or mouse binding action");
     }
-    
+
     action
 }
