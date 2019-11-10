@@ -1,3 +1,4 @@
+extern crate dirs;
 extern crate toml;
 extern crate x11_keysymdef;
 extern crate xcb;
@@ -16,6 +17,9 @@ const DINOWM_CONFIG_PATH: &str = ".config/dinowm/dinowm.toml";
 
 // TODO fix this to not use a purely relative config path
 fn main() {
+    let mut pathbuf = dirs::config_dir().unwrap();
+    pathbuf.push(DINOWM_CONFIG_PATH);
+
     let (conn, screen_num) = xcb::Connection::connect(None).unwrap();
     let setup = conn.get_setup();
     let screen = setup.roots().nth(screen_num as usize).unwrap();
@@ -25,7 +29,7 @@ fn main() {
         setup: &setup,
         screen: &screen,
     };
-    let (style, bindings) = config::load_config(&xorg, DINOWM_CONFIG_PATH);
+    let (style, bindings) = config::load_config(&xorg, pathbuf.to_str().unwrap());
     main_loop(&xorg, style, bindings);
 }
 
