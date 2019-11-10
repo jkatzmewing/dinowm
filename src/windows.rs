@@ -61,4 +61,8 @@ pub fn reparent_window(xorg: &Xorg, ev: &xcb::CreateNotifyEvent, style: &Style) 
         style.border_width,
         (style.border_width * 2) + style.titlebar_height,
     );
+
+    xcb::map_window(xorg.connection, frame);
+    xcb::map_window(xorg.connection, titlebar);
+    xcb::map_window(xorg.connection, ev.window());
 }
