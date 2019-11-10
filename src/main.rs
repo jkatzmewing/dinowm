@@ -13,7 +13,7 @@ use bindings::Binding;
 use style::Style;
 use xorg::Xorg;
 
-const DINOWM_CONFIG_PATH: &str = ".config/dinowm/dinowm.toml";
+const DINOWM_CONFIG_PATH: &str = "dinowm/dinowm.toml";
 
 // TODO fix this to not use a purely relative config path
 fn main() {
