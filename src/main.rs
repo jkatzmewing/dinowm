@@ -25,7 +25,7 @@ fn main() {
         setup: &setup,
         screen: &screen,
     };
-    let (style, bindings) = config::load_config(xorg, DINOWM_CONFIG_PATH);
+    let (style, bindings) = config::load_config(&xorg, DINOWM_CONFIG_PATH);
     main_loop(&xorg, style, bindings);
 }
 

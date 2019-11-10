@@ -17,7 +17,7 @@ fn read_config_file(path: &str) -> String {
 }
 
 fn get_color(
-    xorg: Xorg,
+    xorg: &Xorg,
     cmap: xcb::Colormap,
     name: &str
 ) -> Color {
@@ -35,16 +35,16 @@ fn get_color(
     )
 }
 
-pub fn load_config(xorg: Xorg, path: &str) -> (Style, Vec<Binding>) {
+pub fn load_config(xorg: &Xorg, path: &str) -> (Style, Vec<Binding>) {
     let config = read_config_file(path);
     let doc = config.parse::<Value>().unwrap();
     let cmap = xorg.screen.default_colormap();
 
     let process_color = |e: toml::Value| {
         get_color(
-            xorg,
+            &xorg,
             cmap,
-            e.clone().as_str().unwrap(),
+            e.as_str().unwrap(),
         )
     };
 
@@ -59,14 +59,14 @@ pub fn load_config(xorg: Xorg, path: &str) -> (Style, Vec<Binding>) {
             .try_into()
             .unwrap(),
 
-        titlebar_color_bg: process_color(doc["style"]["titlebar_color_bg"]),
-        titlebar_color_fg: process_color(doc["style"]["titlebar_color_fg"]),
+        titlebar_color_bg: process_color(doc["style"]["titlebar_color_bg"].clone()),
+        titlebar_color_fg: process_color(doc["style"]["titlebar_color_fg"].clone()),
 
-        border_color_bg: process_color(doc["style"]["border_color_bg"]),
-        border_color_fg: process_color(doc["style"]["border_color_fg"]),
+        border_color_bg: process_color(doc["style"]["border_color_bg"].clone()),
+        border_color_fg: process_color(doc["style"]["border_color_fg"].clone()),
 
-        text_color_bg: process_color(doc["style"]["text_color_bg"]),
-        text_color_fg: process_color(doc["style"]["text_color_fg"]),
+        text_color_bg: process_color(doc["style"]["text_color_bg"].clone()),
+        text_color_fg: process_color(doc["style"]["text_color_fg"].clone()),
     };
 
     let mut all_bindings = vec![];
