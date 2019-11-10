@@ -20,9 +20,12 @@ fn main() {
     let mut pathbuf = dirs::config_dir().unwrap();
     pathbuf.push(DINOWM_CONFIG_PATH);
 
-    let (conn, screen_num) = xcb::Connection::connect(None).unwrap();
+    let (conn, screen_num) = xcb::Connection::connect(None).expect("Could not connect to X server");
     let setup = conn.get_setup();
-    let screen = setup.roots().nth(screen_num as usize).unwrap();
+    let screen = setup
+        .roots()
+        .nth(screen_num as usize)
+        .expect("Could not get default screen");
 
     let xorg = Xorg {
         connection: &conn,

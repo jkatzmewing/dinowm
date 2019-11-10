@@ -19,7 +19,7 @@ fn read_config_file(path: &str) -> String {
 fn get_color(xorg: &Xorg, cmap: xcb::Colormap, name: &str) -> Color {
     let reply = xcb::lookup_color(xorg.connection, cmap, name)
         .get_reply()
-        .unwrap();
+        .expect("Config file contains an invalid X11 color name");
 
     Color::new(
         reply.visual_red(),
@@ -31,7 +31,9 @@ fn get_color(xorg: &Xorg, cmap: xcb::Colormap, name: &str) -> Color {
 
 pub fn load_config(xorg: &Xorg, path: &str) -> (Style, Vec<Binding>) {
     let config = read_config_file(path);
-    let doc = config.parse::<Value>().unwrap();
+    let doc = config
+        .parse::<Value>()
+        .expect("dinowm.toml contains invalid TOML");
     let cmap = xorg.screen.default_colormap();
 
     let process_color = |e: toml::Value| get_color(&xorg, cmap, e.as_str().unwrap());
