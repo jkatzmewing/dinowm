@@ -7,6 +7,7 @@ mod bindings;
 mod config;
 mod style;
 mod windows;
+#[macro_use]
 mod xorg;
 
 use bindings::Binding;
@@ -20,18 +21,7 @@ fn main() {
     let mut pathbuf = dirs::config_dir().unwrap();
     pathbuf.push(DINOWM_CONFIG_PATH);
 
-    let (conn, screen_num) = xcb::Connection::connect(None).expect("Could not connect to X server");
-    let setup = conn.get_setup();
-    let screen = setup
-        .roots()
-        .nth(screen_num as usize)
-        .expect("Could not get default screen");
-
-    let xorg = Xorg {
-        connection: &conn,
-        setup: &setup,
-        screen: &screen,
-    };
+    setup_xorg!(xorg);
     let (style, bindings) = config::load_config(&xorg, pathbuf.to_str().unwrap());
     main_loop(&xorg, style, bindings);
 }
