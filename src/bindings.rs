@@ -2,6 +2,7 @@ use xcb;
 
 use crate::xorg::Xorg;
 
+#[derive(Debug, PartialEq, Eq)]
 pub enum BindAction {
     Exec { command: String },
     RaiseWindow,
@@ -10,11 +11,13 @@ pub enum BindAction {
     ResizeWindow,
 }
 
+#[derive(Debug, PartialEq, Eq)]
 pub enum InputType {
     Key { key: xcb::Keysym },
     Button { button: xcb::Button },
 }
 
+#[derive(Debug, PartialEq, Eq)]
 pub struct Binding {
     pub input: InputType,
     pub modifiers: u16,

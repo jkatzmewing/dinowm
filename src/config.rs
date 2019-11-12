@@ -88,6 +88,8 @@ fn parse_mods(input: &str) -> u16 {
     mods.try_into().unwrap()
 }
 
+
+// TODO unit test
 fn parse_keysym(input: &str) -> xcb::Keysym {
     let record = x11_keysymdef::lookup_by_name(input).unwrap();
     record.keysym.try_into().unwrap()
@@ -115,4 +117,27 @@ fn parse_action(input: &str) -> BindAction {
     }
 
     action
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_mods() {
+        let mut mods = 0;
+        mods = xcb::MOD_MASK_1 | xcb::MOD_MASK_4| xcb::MOD_MASK_SHIFT | xcb::MOD_MASK_CONTROL;
+        assert_eq!(parse_mods("WACS"), mods as u16);
+    }
+
+    #[test]
+    fn test_parse_action() {
+        assert_eq!(parse_action("exec:rofi -show drun"), BindAction::Exec {
+            command: "rofi -show drun".to_string(),
+        });
+        assert_eq!(parse_action("raise-window"), BindAction::RaiseWindow);
+        assert_eq!(parse_action("lower-window"), BindAction::LowerWindow);
+        assert_eq!(parse_action("resize-window"), BindAction::ResizeWindow);
+        assert_eq!(parse_action("move-window"), BindAction::MoveWindow);
+    }
 }
