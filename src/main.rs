@@ -3,6 +3,8 @@ extern crate toml;
 extern crate x11_keysymdef;
 extern crate xcb;
 
+use std::convert::TryInto;
+
 mod bindings;
 mod config;
 mod style;
@@ -27,6 +29,28 @@ fn main() {
 }
 
 fn main_loop(xorg: &Xorg, style: Style, bindings: Vec<Binding>) {
+    xcb::grab_key(
+        xorg.connection,
+        true,
+        xorg.screen.root(),
+        xcb::MOD_MASK_ANY.try_into().unwrap(),
+        xcb::GRAB_ANY.try_into().unwrap(),
+        xcb::GRAB_MODE_ASYNC.try_into().unwrap(),
+        xcb::GRAB_MODE_ASYNC.try_into().unwrap(),
+    );
+    xcb::grab_button(
+        xorg.connection,
+        true,
+        xorg.screen.root(),
+        xcb::EVENT_MASK_BUTTON_PRESS.try_into().unwrap(),
+        xcb::GRAB_MODE_ASYNC.try_into().unwrap(),
+        xcb::GRAB_MODE_ASYNC.try_into().unwrap(),
+        xcb::NONE,
+        xcb::NONE,
+        xcb::BUTTON_MASK_ANY.try_into().unwrap(),
+        xcb::MOD_MASK_ANY.try_into().unwrap(),
+    );
+
     loop {
         if let Some(ev) = xorg.connection.wait_for_event() {
             match ev.response_type() & !0x80 {
@@ -51,4 +75,17 @@ fn main_loop(xorg: &Xorg, style: Style, bindings: Vec<Binding>) {
             }
         }
     }
+
+    xcb::ungrab_button(
+        xorg.connection,
+        xcb::BUTTON_MASK_ANY.try_into().unwrap(),
+        xorg.screen.root(),
+        xcb::MOD_MASK_ANY.try_into().unwrap(),
+    );
+    xcb::ungrab_key(
+        xorg.connection,
+        xcb::GRAB_ANY.try_into().unwrap(),
+        xorg.screen.root(),
+        xcb::MOD_MASK_ANY.try_into().unwrap(),
+    );
 }
