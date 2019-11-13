@@ -88,8 +88,6 @@ fn parse_mods(input: &str) -> u16 {
     mods.try_into().unwrap()
 }
 
-
-// TODO unit test
 fn parse_keysym(input: &str) -> xcb::Keysym {
     let record = x11_keysymdef::lookup_by_name(input).unwrap();
     record.keysym.try_into().unwrap()
@@ -128,6 +126,12 @@ mod tests {
         let mut mods = 0;
         mods = xcb::MOD_MASK_1 | xcb::MOD_MASK_4| xcb::MOD_MASK_SHIFT | xcb::MOD_MASK_CONTROL;
         assert_eq!(parse_mods("WACS"), mods as u16);
+    }
+
+    #[test]
+    fn test_parse_keysym() {
+        assert_eq!(parse_keysym("A"), 0x041); // XK_A
+        assert_eq!(parse_keysym("Delete"), 0xFFFF); // XK_Delete
     }
 
     #[test]
