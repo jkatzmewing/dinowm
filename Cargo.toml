@@ -11,4 +11,4 @@ dirs = "2.0"
 toml = "0.5"
 x11-keysymdef = "0.2"
 xcb = { version = "0.8", features = ["render"] }
-xcb-util = "0.2"
+xcb-util = { version = "0.2", features = ["keysyms"] }
