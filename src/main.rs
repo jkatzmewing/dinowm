@@ -12,7 +12,7 @@ mod windows;
 #[macro_use]
 mod xorg;
 
-use bindings::Binding;
+use bindings::BindingsMap;
 use style::Style;
 use xorg::Xorg;
 
@@ -25,10 +25,10 @@ fn main() {
 
     setup_xorg!(xorg);
     let (style, bindings) = config::load_config(&xorg, pathbuf.to_str().unwrap());
-    main_loop(&xorg, style, bindings);
+    main_loop(&xorg, style, &bindings);
 }
 
-fn main_loop(xorg: &Xorg, style: Style, bindings: Vec<Binding>) {
+fn main_loop(xorg: &Xorg, style: Style, bindings: &BindingsMap) {
     xcb::grab_key(
         xorg.connection,
         true,
