@@ -2,6 +2,7 @@ use toml;
 use x11_keysymdef;
 use xcb;
 use xcb::render::Color;
+use xcb_util::keysyms::KeySymbols;
 
 use toml::Value;
 
@@ -29,7 +30,7 @@ fn get_color(xorg: &Xorg, cmap: xcb::Colormap, name: &str) -> Color {
     )
 }
 
-pub fn load_config(xorg: &Xorg, path: &str) -> (Style, Vec<Binding>) {
+pub fn load_config(xorg: &Xorg, path: &str) -> (Style, BindingsMap) {
     let config = read_config_file(path);
     let doc = config
         .parse::<Value>()
@@ -53,16 +54,20 @@ pub fn load_config(xorg: &Xorg, path: &str) -> (Style, Vec<Binding>) {
         text_color_fg: process_color(doc["style"]["text_color_fg"].clone()),
     };
 
-    let mut all_bindings = vec![];
+    let mut all_bindings = BindingsMap::new();
     for elem in doc["bindings"].as_array().unwrap().iter() {
-        let binding = Binding {
-            modifiers: parse_mods(elem["mods"].as_str().unwrap()),
-            input: InputType::Key {
-                key: parse_keysym(elem["key"].as_str().unwrap()),
-            },
-            action: parse_action(elem["action"].as_str().unwrap()),
-        };
-        all_bindings.push(binding);
+        let binding: Binding;
+        let mods = parse_mods(elem["mods"].clone().try_into().unwrap());
+        if let Some(key) = parse_key(&xorg, elem["key"].clone().try_into().unwrap()) {
+            binding = Binding::key(key, mods);
+        } else if let Some(button) = elem["button"].clone().try_into().unwrap() {
+            binding = Binding::button(button, mods);
+        } else {
+            panic!("Config file contains an invalid binding entry");
+        }
+        let action = parse_action(elem["action"].clone().as_str().unwrap());
+
+        all_bindings.add(binding.clone(), action.clone());
     }
 
     (style, all_bindings)
@@ -88,9 +93,13 @@ fn parse_mods(input: &str) -> u16 {
     mods.try_into().unwrap()
 }
 
-fn parse_keysym(input: &str) -> xcb::Keysym {
+fn parse_key(xorg: &Xorg, input: &str) -> Option<xcb::Keycode> {
     let record = x11_keysymdef::lookup_by_name(input).unwrap();
-    record.keysym.try_into().unwrap()
+    let keysym = record.keysym.try_into().unwrap();
+    let symbols = KeySymbols::new(xorg.connection);
+
+    // TODO figure out if subsequent KeycodeIter values are relevant
+    symbols.get_keycode(keysym).next()
 }
 
 fn parse_action(input: &str) -> BindAction {
@@ -126,12 +135,6 @@ mod tests {
         let mut mods = 0;
         mods = xcb::MOD_MASK_1 | xcb::MOD_MASK_4| xcb::MOD_MASK_SHIFT | xcb::MOD_MASK_CONTROL;
         assert_eq!(parse_mods("WACS"), mods as u16);
-    }
-
-    #[test]
-    fn test_parse_keysym() {
-        assert_eq!(parse_keysym("A"), 0x041); // XK_A
-        assert_eq!(parse_keysym("Delete"), 0xFFFF); // XK_Delete
     }
 
     #[test]
