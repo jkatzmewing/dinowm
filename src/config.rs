@@ -62,10 +62,12 @@ pub fn load_config(xorg: &Xorg, path: &str) -> (Style, BindingsMap) {
             binding = Binding::key(key, mods);
         } else if let Some(button) = elem["button"].clone().try_into().unwrap() {
             binding = Binding::button(button, mods);
+        } else {
+            panic!("Config file contains an invalid binding entry");
         }
         let action = parse_action(elem["action"].clone().as_str().unwrap());
 
-        all_bindings.add(binding, action);
+        all_bindings.add(binding.clone(), action.clone());
     }
 
     (style, all_bindings)
