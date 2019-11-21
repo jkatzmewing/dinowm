@@ -2,6 +2,7 @@ image: "rust:latest"
 
 before_script:
   - apt-get update -qq && apt-get install -qqy xorg-dev libxcb-util0-dev libxcb-keysyms1-dev
+  - rustup component add clippy
 
 build:
   stage: build
