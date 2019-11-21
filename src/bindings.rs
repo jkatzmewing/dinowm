@@ -58,14 +58,12 @@ impl BindingsMap {
 
     pub fn lookup_key(&self, xorg: &Xorg, key: xcb::Keycode, mods: u16) -> Option<&BindAction> {
         let binding = Binding::key(key, mods);
-        let retval = self.map.get(&binding);
-        retval
+        self.map.get(&binding)
     }
 
     pub fn lookup_button(&self, button: xcb::Button, mods: u16) -> Option<&BindAction> {
         let binding = Binding::button(button, mods);
-        let retval = self.map.get(&binding);
-        retval
+        self.map.get(&binding)
     }
 
     pub fn add(&mut self, binding: Binding, action: BindAction) {

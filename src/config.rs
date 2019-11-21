@@ -77,16 +77,16 @@ fn parse_mods(input: &str) -> u16 {
     let text = input.to_string();
     let mut mods = 0;
     // TODO add support for Apple command key
-    if text.contains("A") {
+    if text.contains('A') {
         mods |= xcb::MOD_MASK_1;
     }
-    if text.contains("C") {
+    if text.contains('C') {
         mods |= xcb::MOD_MASK_CONTROL;
     }
-    if text.contains("S") {
+    if text.contains('S') {
         mods |= xcb::MOD_MASK_SHIFT;
     }
-    if text.contains("W") {
+    if text.contains('W') {
         mods |= xcb::MOD_MASK_4;
     }
 
@@ -106,7 +106,7 @@ fn parse_action(input: &str) -> BindAction {
     let text = input.to_string();
     let action: BindAction;
     if text.starts_with("exec:") {
-        let text: Vec<&str> = text.splitn(2, ":").collect();
+        let text: Vec<&str> = text.splitn(2, ':').collect();
         let cmd = text[1];
         action = BindAction::Exec {
             command: cmd.to_string(),
