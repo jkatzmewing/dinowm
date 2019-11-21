@@ -28,18 +28,14 @@ pub struct Binding {
 impl Binding {
     pub fn key(input: xcb::Keycode, mods: u16) -> Self {
         Binding {
-            input: InputType::Key {
-                key: input,
-            },
+            input: InputType::Key { key: input },
             modifiers: mods,
         }
     }
 
     pub fn button(input: xcb::Button, mods: u16) -> Self {
         Binding {
-            input: InputType::Button {
-                button: input,
-            },
+            input: InputType::Button { button: input },
             modifiers: mods,
         }
     }
@@ -86,4 +82,3 @@ pub fn process_button(xorg: &Xorg, ev: &xcb::ButtonPressEvent, bindings: &Bindin
 fn do_action(action: &BindAction) {
     std::unimplemented!();
 }
-

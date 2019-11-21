@@ -133,15 +133,18 @@ mod tests {
     #[test]
     fn test_parse_mods() {
         let mut mods = 0;
-        mods = xcb::MOD_MASK_1 | xcb::MOD_MASK_4| xcb::MOD_MASK_SHIFT | xcb::MOD_MASK_CONTROL;
+        mods = xcb::MOD_MASK_1 | xcb::MOD_MASK_4 | xcb::MOD_MASK_SHIFT | xcb::MOD_MASK_CONTROL;
         assert_eq!(parse_mods("WACS"), mods as u16);
     }
 
     #[test]
     fn test_parse_action() {
-        assert_eq!(parse_action("exec:rofi -show drun"), BindAction::Exec {
-            command: "rofi -show drun".to_string(),
-        });
+        assert_eq!(
+            parse_action("exec:rofi -show drun"),
+            BindAction::Exec {
+                command: "rofi -show drun".to_string(),
+            }
+        );
         assert_eq!(parse_action("raise-window"), BindAction::RaiseWindow);
         assert_eq!(parse_action("lower-window"), BindAction::LowerWindow);
         assert_eq!(parse_action("resize-window"), BindAction::ResizeWindow);

@@ -8,7 +8,8 @@ pub struct Xorg<'a> {
 
 macro_rules! setup_xorg {
     ($x: ident) => {
-        let (conn, screen_num) = xcb::Connection::connect(None).expect("Could not connect to X server");
+        let (conn, screen_num) =
+            xcb::Connection::connect(None).expect("Could not connect to X server");
         let setup = conn.get_setup();
         let screen = setup
             .roots()
@@ -20,6 +21,5 @@ macro_rules! setup_xorg {
             setup: &setup,
             screen: &screen,
         };
-    }
+    };
 }
-
