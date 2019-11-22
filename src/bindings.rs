@@ -83,10 +83,15 @@ pub fn process_button(xorg: &Xorg, ev: &xcb::ButtonPressEvent, bindings: &Bindin
 fn do_action(xorg: &Xorg, window: xcb::Window, action: &BindAction) {
     match action {
         BindAction::Exec{command} => {
-            if let Some(output) = Command::new("sh").arg("-c").args(command) {
-                println!(output);
+            if let Some(p) = Command::new("sh").arg("-c").args(command).spawn() {
+                match p.wait() {
+                    None => {
+                        eprintln!("Failed to wait on child process for command: {}", command);
+                    }
+                    _ => (),
+                }
             } else {
-                println!("Failed to execute command: {}", command);
+                eprintln!("Failed to execute command: {}", command);
             }
         },
         BindAction::RaiseWindow => windows::raise(xorg, window),
