@@ -1,7 +1,7 @@
 use xcb;
 
 use std::collections::HashMap;
-use std::process::Command;
+use std::process::{Command, Child};
 
 use crate::xorg::Xorg;
 
@@ -83,15 +83,17 @@ pub fn process_button(xorg: &Xorg, ev: &xcb::ButtonPressEvent, bindings: &Bindin
 fn do_action(xorg: &Xorg, window: xcb::Window, action: &BindAction) {
     match action {
         BindAction::Exec{command} => {
-            if let Some(p) = Command::new("sh").arg("-c").args(command).spawn() {
-                match p.wait() {
+            let p = Command::new("sh").arg("-c").args(command).spawn();
+            match p {
+                Ok(child) => match child.wait() {
                     None => {
-                        eprintln!("Failed to wait on child process for command: {}", command);
-                    }
+                        eprintln!("Failed to wait on child for command: {}", command);
+                    },
                     _ => (),
                 }
-            } else {
-                eprintln!("Failed to execute command: {}", command);
+                Err(e) => {
+                    eprintln!("Failed to execute command: {}", e);
+                }
             }
         },
         BindAction::RaiseWindow => windows::raise(xorg, window),
