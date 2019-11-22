@@ -70,35 +70,35 @@ impl BindingsMap {
 
 pub fn process_key(xorg: &Xorg, ev: &xcb::KeyPressEvent, bindings: &BindingsMap) {
     if let Some(action) = bindings.lookup_key(xorg, ev.detail(), ev.state()) {
-        do_action(action);
+        do_action(xorg, action);
     }
 }
 
 pub fn process_button(xorg: &Xorg, ev: &xcb::ButtonPressEvent, bindings: &BindingsMap) {
     if let Some(action) = bindings.lookup_button(ev.detail(), ev.state()) {
-        do_action(xorg, ev.window(), action);
+        do_action(xorg, action);
     }
 }
 
-fn do_action(xorg: &Xorg, window: xcb::Window, action: &BindAction) {
+fn do_action(xorg: &Xorg, action: &BindAction) {
     match action {
         BindAction::Exec{command} => {
             let p = Command::new("sh").arg("-c").args(command).spawn();
             match p {
                 Ok(child) => match child.wait() {
-                    None => {
+                    Ok(k) => (),
+                    Err(e) => {
                         eprintln!("Failed to wait on child for command: {}", command);
                     },
-                    _ => (),
                 }
                 Err(e) => {
                     eprintln!("Failed to execute command: {}", e);
                 }
             }
         },
-        BindAction::RaiseWindow => windows::raise(xorg, window),
-        BindAction::LowerWindow => windows::lower(xorg, window),
-        BindAction::MoveWindow => windows::manual_move(xorg, window),
-        BindAction::ResizeWindow => windows::manual_resize(xorg, window),
+        BindAction::RaiseWindow => windows::raise(xorg),
+        BindAction::LowerWindow => windows::lower(xorg),
+        BindAction::MoveWindow => windows::manual_move(xorg),
+        BindAction::ResizeWindow => windows::manual_resize(xorg),
     }
 }

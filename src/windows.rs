@@ -67,26 +67,26 @@ pub fn reparent_window(xorg: &Xorg, ev: &xcb::CreateNotifyEvent, style: &Style) 
     xcb::map_window(xorg.connection, ev.window());
 }
 
-pub fn raise(xorg: &Xorg, window: xcb::Window) {
+pub fn raise(xorg: &Xorg) {
     xcb::circulate_window(
         xorg.connection,
         xcb::CIRCULATE_RAISE_LOWEST as u8,
-        window,
+        xorg.screen.root(),
     );
 }
 
-pub fn lower(xorg: &Xorg, window: xcb::Window) {
+pub fn lower(xorg: &Xorg) {
     xcb::circulate_window(
         xorg.connection,
         xcb::CIRCULATE_LOWER_HIGHEST as u8,
-        window,
+        xorg.screen.root(),
     );
 }
 
-pub fn manual_move(xorg: &Xorg, window: xcb::Window) {
+pub fn manual_move(xorg: &Xorg) {
     std::unimplemented!();
 }
 
-pub fn manual_resize(xorg: &Xorg, window: xcb::Window) {
+pub fn manual_resize(xorg: &Xorg) {
     std::unimplemented!();
 }
