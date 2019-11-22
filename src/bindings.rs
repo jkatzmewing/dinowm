@@ -83,6 +83,7 @@ pub fn process_button(xorg: &Xorg, ev: &xcb::ButtonPressEvent, bindings: &Bindin
 fn do_action(xorg: &Xorg, action: &BindAction) {
     match action {
         BindAction::Exec{command} => {
+            let command = command.split(" ").collect();
             let p = Command::new("sh").arg("-c").args(command).spawn();
             match p {
                 Ok(child) => match child.wait() {
