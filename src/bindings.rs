@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use std::process::{Command, Child};
 
 use crate::xorg::Xorg;
+use crate::windows;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum BindAction {
