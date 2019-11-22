@@ -1,6 +1,7 @@
 use xcb;
 
 use std::collections::HashMap;
+use std::process::Command;
 
 use crate::xorg::Xorg;
 
@@ -75,10 +76,22 @@ pub fn process_key(xorg: &Xorg, ev: &xcb::KeyPressEvent, bindings: &BindingsMap)
 
 pub fn process_button(xorg: &Xorg, ev: &xcb::ButtonPressEvent, bindings: &BindingsMap) {
     if let Some(action) = bindings.lookup_button(ev.detail(), ev.state()) {
-        do_action(action);
+        do_action(xorg, ev.window(), action);
     }
 }
 
-fn do_action(action: &BindAction) {
-    std::unimplemented!();
+fn do_action(xorg: &Xorg, window: xcb::Window, action: &BindAction) {
+    match action {
+        BindAction::Exec{command} => {
+            if let Some(output) = Command::new("sh").arg("-c").args(command) {
+                println!(output);
+            } else {
+                println!("Failed to execute command: {}", command);
+            }
+        },
+        BindAction::RaiseWindow => windows::raise(xorg, window),
+        BindAction::LowerWindow => windows::lower(xorg, window),
+        BindAction::MoveWindow => windows::manual_move(xorg, window),
+        BindAction::ResizeWindow => windows::manual_resize(xorg, window),
+    }
 }
