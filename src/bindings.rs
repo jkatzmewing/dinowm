@@ -1,7 +1,9 @@
 use xcb;
 
 use std::collections::HashMap;
+use std::process::{Child, Command};
 
+use crate::windows;
 use crate::xorg::Xorg;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -69,16 +71,36 @@ impl BindingsMap {
 
 pub fn process_key(xorg: &Xorg, ev: &xcb::KeyPressEvent, bindings: &BindingsMap) {
     if let Some(action) = bindings.lookup_key(xorg, ev.detail(), ev.state()) {
-        do_action(action);
+        do_action(xorg, action);
     }
 }
 
 pub fn process_button(xorg: &Xorg, ev: &xcb::ButtonPressEvent, bindings: &BindingsMap) {
     if let Some(action) = bindings.lookup_button(ev.detail(), ev.state()) {
-        do_action(action);
+        do_action(xorg, action);
     }
 }
 
-fn do_action(action: &BindAction) {
-    std::unimplemented!();
+fn do_action(xorg: &Xorg, action: &BindAction) {
+    match action {
+        BindAction::Exec { command } => {
+            let args: Vec<&str> = command.split(" ").collect();
+            let p = Command::new("sh").arg("-c").args(args).spawn();
+            match p {
+                Ok(mut child) => match child.wait() {
+                    Ok(k) => (),
+                    Err(e) => {
+                        eprintln!("Failed to wait on child for command: {}", command);
+                    }
+                },
+                Err(e) => {
+                    eprintln!("Failed to execute command: {}", e);
+                }
+            }
+        }
+        BindAction::RaiseWindow => windows::raise(xorg),
+        BindAction::LowerWindow => windows::lower(xorg),
+        BindAction::MoveWindow => windows::manual_move(xorg),
+        BindAction::ResizeWindow => windows::manual_resize(xorg),
+    }
 }
