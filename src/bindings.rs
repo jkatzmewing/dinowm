@@ -87,7 +87,7 @@ fn do_action(xorg: &Xorg, action: &BindAction) {
             let args: Vec<&str> = command.split(" ").collect();
             let p = Command::new("sh").arg("-c").args(args).spawn();
             match p {
-                Ok(child) => match child.wait() {
+                Ok(mut child) => match child.wait() {
                     Ok(k) => (),
                     Err(e) => {
                         eprintln!("Failed to wait on child for command: {}", command);
