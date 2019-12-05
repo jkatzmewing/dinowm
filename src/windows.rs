@@ -83,10 +83,10 @@ pub fn lower(xorg: &Xorg) {
     );
 }
 
-pub fn manual_move(xorg: &Xorg) {
+pub fn begin_move_resize(xorg: &Xorg, resizing: bool) {
     std::unimplemented!();
 }
 
-pub fn manual_resize(xorg: &Xorg) {
+pub fn end_move_resize(xorg: &Xorg) {
     std::unimplemented!();
 }

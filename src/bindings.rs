@@ -75,6 +75,16 @@ pub fn process_key(xorg: &Xorg, ev: &xcb::KeyPressEvent, bindings: &BindingsMap)
     }
 }
 
+pub fn process_key_release(xorg: &Xorg, ev: &xcb::KeyReleaseEvent, bindings: &BindingsMap) {
+    use BindAction::*;
+    if let Some(action) = bindings.lookup_key(xorg, ev.detail(), ev.state()) {
+        // Was a move or resize binding just released?
+        if *action == MoveWindow || *action == ResizeWindow {
+            windows::end_move_resize(xorg);
+        }
+    }
+}
+
 pub fn process_button(xorg: &Xorg, ev: &xcb::ButtonPressEvent, bindings: &BindingsMap) {
     if let Some(action) = bindings.lookup_button(ev.detail(), ev.state()) {
         do_action(xorg, action);
@@ -100,7 +110,9 @@ fn do_action(xorg: &Xorg, action: &BindAction) {
         }
         BindAction::RaiseWindow => windows::raise(xorg),
         BindAction::LowerWindow => windows::lower(xorg),
-        BindAction::MoveWindow => windows::manual_move(xorg),
-        BindAction::ResizeWindow => windows::manual_resize(xorg),
+        BindAction::MoveWindow => windows::begin_move_resize(xorg, false),
+        BindAction::ResizeWindow => windows::begin_move_resize(xorg, true),
     }
 }
+
+

@@ -59,6 +59,11 @@ fn main_loop(xorg: &Xorg, style: Style, bindings: &BindingsMap) {
                     bindings::process_key(xorg, key, &bindings);
                 }
 
+                xcb::KEY_RELEASE => {
+                    let key: &xcb::KeyReleaseEvent = unsafe { xcb::cast_event(&ev) };
+                    bindings::process_key_release(xorg, key, &bindings);
+                }
+
                 xcb::BUTTON_PRESS => {
                     let button: &xcb::ButtonPressEvent = unsafe { xcb::cast_event(&ev) };
                     bindings::process_button(xorg, button, &bindings);
