@@ -1,7 +1,7 @@
 use xcb;
 
 use std::collections::HashMap;
-use std::process::{Child, Command};
+use std::process::Command;
 
 use crate::windows;
 use crate::xorg::Xorg;
@@ -94,7 +94,7 @@ pub fn process_button(xorg: &Xorg, ev: &xcb::ButtonPressEvent, bindings: &Bindin
 fn do_action(xorg: &Xorg, action: &BindAction) {
     match action {
         BindAction::Exec { command } => {
-            let args: Vec<&str> = command.split(" ").collect();
+            let args: Vec<&str> = command.split(' ').collect();
             let p = Command::new("sh").arg("-c").args(args).spawn();
             match p {
                 Ok(mut child) => match child.wait() {
