@@ -2,6 +2,7 @@ use xcb;
 
 use std::convert::TryInto;
 
+use crate::state::WmState;
 use crate::style::Style;
 use crate::xorg::Xorg;
 
@@ -44,7 +45,7 @@ fn draw_window_titlebar(xorg: &Xorg, window: xcb::Window, style: &Style) -> xcb:
     titlebar
 }
 
-pub fn reparent_window(xorg: &Xorg, ev: &xcb::CreateNotifyEvent, style: &Style) {
+pub fn reparent_window(xorg: &Xorg, ev: &xcb::CreateNotifyEvent, wm_state: &WmState, style: &Style) {
     let titlebar = draw_window_titlebar(xorg, ev.window(), style);
     let frame = draw_window_frame(xorg, ev.window(), style);
     xcb::reparent_window(

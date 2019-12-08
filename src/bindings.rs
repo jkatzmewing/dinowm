@@ -3,6 +3,7 @@ use xcb;
 use std::collections::HashMap;
 use std::process::Command;
 
+use crate::state::WmState;
 use crate::windows;
 use crate::xorg::Xorg;
 
@@ -13,6 +14,8 @@ pub enum BindAction {
     LowerWindow,
     MoveWindow,
     ResizeWindow,
+    Restart,
+    Quit,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -69,31 +72,32 @@ impl BindingsMap {
     }
 }
 
-pub fn process_key(xorg: &Xorg, ev: &xcb::KeyPressEvent, bindings: &BindingsMap) {
+pub fn process_key(xorg: &Xorg, ev: &xcb::KeyPressEvent, wm_state: &mut WmState, bindings: &BindingsMap) {
     if let Some(action) = bindings.lookup_key(xorg, ev.detail(), ev.state()) {
-        do_action(xorg, action);
+        do_action(xorg, wm_state, action);
     }
 }
 
-pub fn process_key_release(xorg: &Xorg, ev: &xcb::KeyReleaseEvent, bindings: &BindingsMap) {
+pub fn process_key_release(xorg: &Xorg, ev: &xcb::KeyReleaseEvent, wm_state: &mut WmState, bindings: &BindingsMap) {
     use BindAction::*;
     if let Some(action) = bindings.lookup_key(xorg, ev.detail(), ev.state()) {
         // Was a move or resize binding just released?
         if *action == MoveWindow || *action == ResizeWindow {
-            windows::end_move_resize(xorg);
+            wm_state.stop_move_resize();
         }
     }
 }
 
-pub fn process_button(xorg: &Xorg, ev: &xcb::ButtonPressEvent, bindings: &BindingsMap) {
+pub fn process_button(xorg: &Xorg, ev: &xcb::ButtonPressEvent, wm_state: &mut WmState, bindings: &BindingsMap) {
     if let Some(action) = bindings.lookup_button(ev.detail(), ev.state()) {
-        do_action(xorg, action);
+        do_action(xorg, wm_state, action);
     }
 }
 
-fn do_action(xorg: &Xorg, action: &BindAction) {
+fn do_action(xorg: &Xorg, wm_state: &mut WmState, action: &BindAction) {
+    use BindAction::*;
     match action {
-        BindAction::Exec { command } => {
+        Exec { command } => {
             let args: Vec<&str> = command.split(' ').collect();
             let p = Command::new("sh").arg("-c").args(args).spawn();
             match p {
@@ -108,10 +112,16 @@ fn do_action(xorg: &Xorg, action: &BindAction) {
                 }
             }
         }
-        BindAction::RaiseWindow => windows::raise(xorg),
-        BindAction::LowerWindow => windows::lower(xorg),
-        BindAction::MoveWindow => windows::begin_move_resize(xorg, false),
-        BindAction::ResizeWindow => windows::begin_move_resize(xorg, true),
+        RaiseWindow => windows::raise(xorg),
+        LowerWindow => windows::lower(xorg),
+        MoveWindow => wm_state.start_move_resize(false),
+        ResizeWindow => wm_state.start_move_resize(true),
+        Restart => {
+            xorg.unset_grabs();
+        },
+        Quit => {
+            xorg.unset_grabs();
+        },
     }
 }
 
