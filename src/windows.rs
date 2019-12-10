@@ -84,10 +84,20 @@ pub fn lower(xorg: &Xorg) {
     );
 }
 
-pub fn begin_move_resize(xorg: &Xorg, resizing: bool) {
+pub fn move_current(
+    xorg: &Xorg,
+    ev: &xcb::MotionNotifyEvent,
+    old_x: i16,
+    old_y: i16,
+) {
     std::unimplemented!();
 }
 
-pub fn end_move_resize(xorg: &Xorg) {
+pub fn resize_current(
+    xorg: &Xorg,
+    ev: &xcb::MotionNotifyEvent,
+    old_x: i16,
+    old_y: i16,
+) {
     std::unimplemented!();
 }

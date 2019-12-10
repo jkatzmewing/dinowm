@@ -114,8 +114,8 @@ fn do_action(xorg: &Xorg, wm_state: &mut WmState, action: &BindAction) {
         }
         RaiseWindow => windows::raise(xorg),
         LowerWindow => windows::lower(xorg),
-        MoveWindow => wm_state.start_move_resize(false),
-        ResizeWindow => wm_state.start_move_resize(true),
+        MoveWindow => wm_state.start_move(),
+        ResizeWindow => wm_state.start_resize(),
         Restart => {
             xorg.unset_grabs();
         },

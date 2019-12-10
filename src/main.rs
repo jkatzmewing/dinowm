@@ -32,9 +32,22 @@ fn main_loop(xorg: &Xorg, style: Style, bindings: &BindingsMap) {
 
     xorg.set_grabs(); // must be unset with unset_grabs() on Quit or Restart actions
 
+    let (mut old_x, mut old_y) = (0, 0);
     loop {
         if let Some(ev) = xorg.connection.wait_for_event() {
-            match ev.response_type() & !0x80 {
+            match ev.response_type() {
+                xcb::MOTION_NOTIFY => {
+                    let motion: &xcb::MotionNotifyEvent = unsafe { xcb::cast_event(&ev) };
+                    if wm_state.is_moving() {
+                        windows::move_current(xorg, motion, old_x, old_y);
+                    } else if wm_state.is_resizing() {
+                        windows::resize_current(xorg, motion, old_x, old_y);
+                    }
+
+                    old_x = motion.root_x();
+                    old_y = motion.root_y();
+                }
+
                 xcb::KEY_PRESS => {
                     let key: &xcb::KeyPressEvent = unsafe { xcb::cast_event(&ev) };
                     bindings::process_key(xorg, key, &mut wm_state, &bindings);
