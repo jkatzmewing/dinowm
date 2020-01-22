@@ -6,12 +6,6 @@ use crate::state::WmState;
 use crate::style::Style;
 use crate::xorg::Xorg;
 
-pub struct WinBundle {
-    pub frame: xcb::Window,
-    pub titlebar: xcb::Window,
-    pub contents: xcb::Window,
-}
-
 fn draw_window_frame(xorg: &Xorg, window: xcb::Window, style: &Style) -> xcb::Window {
     let frame = xorg.connection.generate_id();
     xcb::create_window(
@@ -51,37 +45,27 @@ fn draw_window_titlebar(xorg: &Xorg, window: xcb::Window, style: &Style) -> xcb:
     titlebar
 }
 
-pub fn reparent_window(
-    xorg: &Xorg,
-    ev: &xcb::CreateNotifyEvent,
-    wm_state: &WmState,
-    style: &Style
-) -> WinBundle {
-    let bundle = WinBundle {
-        frame: draw_window_frame(xorg, ev.window(), style),
-        titlebar: draw_window_titlebar(xorg, ev.window(), style),
-        contents: ev.window(),
-    };
+pub fn reparent_window(xorg: &Xorg, ev: &xcb::CreateNotifyEvent, wm_state: &WmState, style: &Style) {
+    let titlebar = draw_window_titlebar(xorg, ev.window(), style);
+    let frame = draw_window_frame(xorg, ev.window(), style);
     xcb::reparent_window(
         xorg.connection,
-        bundle.titlebar,
-        bundle.frame,
+        titlebar,
+        frame,
         style.border_width,
         style.border_width,
     );
     xcb::reparent_window(
         xorg.connection,
-        bundle.contents,
-        bundle.frame,
+        ev.window(),
+        frame,
         style.border_width,
         (style.border_width * 2) + style.titlebar_height,
     );
 
-    xcb::map_window(xorg.connection, bundle.frame);
-    xcb::map_window(xorg.connection, bundle.titlebar);
-    xcb::map_window(xorg.connection, bundle.contents);
-
-    bundle
+    xcb::map_window(xorg.connection, frame);
+    xcb::map_window(xorg.connection, titlebar);
+    xcb::map_window(xorg.connection, ev.window());
 }
 
 pub fn raise(xorg: &Xorg) {
